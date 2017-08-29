@@ -3,10 +3,99 @@
 * 线性模型
 ** 平稳线性
 *** 严平稳
+    - 时间序列中的任意一段的的分布在时间平移变换中保持不变
+    - 难以用经验方法验证
 *** 弱平稳
-** 相关系数
-** 自相关系数
-** 自相关函数
+    - 对于实践序列{rt}, r(t)均值是常数, r(t)和r(t-l)的协方差由l决定
+    - 如果序列有弱稳定性, 就可以对未来的观测进行推断, 即预测
+    - 在金融分析中常假定收益率序列是弱平稳的
+** ACF: 样本自相关函数(Autocorrelation Function)
+   - 自相关函数首先是假设序列是弱相关的
+*** 计算原理(python)
+    - rt1为时间序列, rt0为其向前平移l期的历史数据, l期的自相关系数就是rt1和rt0的相关性
+    - 注意: 计算方法和标准计算方法存在一定误差, 主要在于说明原理
+    #+BEGIN_SRC python
+    from random import gauss
+    from pandas import Series
+    rt = Series(map(lambda x: gauss(0, 1), range(1000)))
+    l = 1
+    rt1 = rt[l:].reset_index(drop=True)
+    rt0 = rt[:-l].reset_index(drop=True)
+    return rt1.corr(rt0)
+    #+END_SRC
+
+    #+RESULTS:
+    : -0.071987843338
+*** ACF计算脚本(pyhton)
+    - 自相关函数就是从0-l的自相关系数的序列, 以下为计算方法
+    #+BEGIN_SRC python
+    from random import gauss
+    from statsmodels.tsa.stattools import acf
+    from pandas import Series
+    rt = Series(map(lambda x: gauss(0, 1), range(1000)))
+    return acf(rt, nlags=5)
+    #+END_SRC
+
+    #+RESULTS:
+** 混成检验(Portmanteau Test)
+*** Ljung-Box
+    - 是混成检验的一种方法
+    - 较小的p值表示序列具有自相关性 
+**** IBM简单收益率
+     Q5: 3.37, p-value: 0.64, 结论: 没有序列相关性
+     #+BEGIN_SRC python
+     import pandas as pd
+     from statsmodels.stats.diagnostic import acorr_ljungbox
+     df = pd.read_table('data/m-ibm3dx2608.txt', delim_whitespace=True)
+     ret = df['ibmrtn']
+     return acorr_ljungbox(ret, lags=5)
+     #+END_SRC
+
+     #+RESULTS:
+     | array | ((1.59186057 1.63285984 1.95680258 2.935275 3.36822158)) | array | ((0.20706051 0.44200684 0.58142072 0.56871475 0.64341427)) |
+**** IBM对数收益率
+     Q5: 3.52, p-value: 0.62, 结论: 没有序列相关性
+     #+BEGIN_SRC python
+     import math
+     import pandas as pd
+     from statsmodels.stats.diagnostic import acorr_ljungbox
+     df = pd.read_table('data/m-ibm3dx2608.txt', delim_whitespace=True)
+     ret = df['ibmrtn']
+     lret = (ret + 1).apply(math.log)
+     return acorr_ljungbox(lret, lags=5)
+     #+END_SRC
+
+     #+RESULTS:
+     | array | ((1.96700707 1.96751272 2.16162956 2.95889339 3.52357851)) | array | ((0.1607659 0.37390394 0.53954564 0.56472789 0.61982294)) |
+
+**** CRSP简单收益率
+     Q5: 29.71, p-value: 1.68e-5, 结论: 有序列相关性
+     #+BEGIN_SRC python
+     import pandas as pd
+     from statsmodels.stats.diagnostic import acorr_ljungbox
+     df = pd.read_table('data/m-ibm3dx2608.txt', delim_whitespace=True)
+     ret = df['vwrtn']
+     return acorr_ljungbox(ret, lags=5)
+     #+END_SRC
+
+     #+RESULTS:
+     | array | ((13.30296086 13.57991139 24.92941759 24.99213515 29.71071903)) | array | ((0.000264987326 0.00112501862 1.59741684e-05 5.04933343e-05 1.68136612e-05)) |
+
+**** CRSP对数收益率 
+     Q5: 28.38, p-vlaue: 3.07e-5, 结论: 有序列相关性
+     #+BEGIN_SRC python
+     import math
+     import pandas as pd
+     from statsmodels.stats.diagnostic import acorr_ljungbox
+     df = pd.read_table('data/m-ibm3dx2608.txt', delim_whitespace=True)
+     ret = df['vwrtn']
+     lret = (ret + 1).apply(math.log)
+     return acorr_ljungbox(lret, lags=5)
+     #+END_SRC
+
+     #+RESULTS:
+     | array | ((12.10621836 12.23689637 21.49225015 21.70925299 28.37861003)) | array | ((0.0005025395 0.00220187021 8.31865512e-05 0.000228972584 3.06919959e-05)) |
+
 ** 白噪声
 *** 定义
     - 时间序列{rt}是一个具有"有限均值"和"有限方差"的"独立" "同分布" "随机" 变量序列, {rt}为白噪声序列.
@@ -23,6 +112,7 @@
 ** ARMA: 自回归滑动平均模型(Autoregressive moving average model) [[[https://zh.wikipedia.org/wiki/ARMA%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 是研究时间序列的重要方法，由自回归模型（简称AR模型）与滑动平均模型（简称MA模型）为基础“混合”构成
    - 在市场研究中常用于长期追踪资料的研究，如：Panel研究中，用于消费行为模式变迁研究；在零售研究中，用于具有季节变动特征的销售量、市场规模的预测等。
+** 单位根非平稳性
 * 条件异方差模型
 ** ARCH: 自回归条件异方差模型 [[[https://zh.wikipedia.org/wiki/ARCH%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 解决了传统的计量经济学对时间序列变量的第二个假设（方差恒定）所引起的问题。
