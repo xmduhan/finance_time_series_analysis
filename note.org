@@ -104,6 +104,8 @@
 *** 高斯白噪声
     - 如果{rt}是白噪声, 而且还服从均值为0，方差为6^2的正太分布，就是高斯白噪声序列.
 ** 线性时间序列
+
+
 ** AR: 自回归模型(Autoregressive model) [[[https://zh.wikipedia.org/wiki/%25E8%2587%25AA%25E8%25BF%25B4%25E6%25AD%25B8%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 统计上一种处理时间序列的方法, 用同一变数例如x的之前各期, 亦即x(1)至x(t-1)来预测本期x(t)的表现, 并假设它们为一线性关系.
    - 因为这是从回归分析中的线性回归发展而来, 只是不用x预测y, 而是用x预测x（自己）; 所以叫做自回归.
@@ -130,3 +132,21 @@
 ** VAR: 向量自回归模型(Vector Autoregression model) [[[https://zh.wikipedia.org/wiki/%25E5%2590%2591%25E9%2587%258F%25E8%2587%25AA%25E5%259B%259E%25E5%25BD%2592%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 是一种常用的计量经济模型，由计量经济学家和宏观经济学家克里斯托弗·西姆斯（英语：Christopher Sims）提出.
    - 它扩充了只能使用一个变量的自回归模型（简称：AR模型），使容纳大于1个变量，因此经常用在多变量时间序列模型的分析上。
+     
+
+
+
+#+BEGIN_SRC python :session :results file
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+fig=plt.figure(figsize=(3,2))
+plt.plot([1,3,2])
+fig.tight_layout()
+plt.savefig('myfig.pdf')
+'myfig.pdf' # return this to org-mode
+#+END_SRC
+
+#+RESULTS:
+[[file:myfig.pdf]]
+
