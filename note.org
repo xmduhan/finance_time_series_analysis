@@ -14,7 +14,7 @@
 *** 计算原理(python)
     - rt1为时间序列, rt0为其向前平移l期的历史数据, l期的自相关系数就是rt1和rt0的相关性
     - 注意: 计算方法和标准计算方法存在一定误差, 主要在于说明原理
-    #+BEGIN_SRC python
+    #+BEGIN_SRC python :exports both
     from random import gauss
     from pandas import Series
     rt = Series(map(lambda x: gauss(0, 1), range(1000)))
@@ -28,7 +28,7 @@
     : -0.071987843338
 *** ACF计算脚本(pyhton)
     - 自相关函数就是从0-l的自相关系数的序列, 以下为计算方法
-    #+BEGIN_SRC python
+    #+BEGIN_SRC python :exports both
     from random import gauss
     from statsmodels.tsa.stattools import acf
     from pandas import Series
@@ -43,7 +43,7 @@
     - 较小的p值表示序列具有自相关性 
 **** IBM简单收益率
      Q5: 3.37, p-value: 0.64, 结论: 没有序列相关性
-     #+BEGIN_SRC python
+     #+BEGIN_SRC python :exports both
      import pandas as pd
      from statsmodels.stats.diagnostic import acorr_ljungbox
      df = pd.read_table('data/m-ibm3dx2608.txt', delim_whitespace=True)
@@ -55,7 +55,7 @@
      | array | ((1.59186057 1.63285984 1.95680258 2.935275 3.36822158)) | array | ((0.20706051 0.44200684 0.58142072 0.56871475 0.64341427)) |
 **** IBM对数收益率
      Q5: 3.52, p-value: 0.62, 结论: 没有序列相关性
-     #+BEGIN_SRC python
+     #+BEGIN_SRC python :exports both
      import math
      import pandas as pd
      from statsmodels.stats.diagnostic import acorr_ljungbox
@@ -70,7 +70,7 @@
 
 **** CRSP简单收益率
      Q5: 29.71, p-value: 1.68e-5, 结论: 有序列相关性
-     #+BEGIN_SRC python
+     #+BEGIN_SRC python :exports both
      import pandas as pd
      from statsmodels.stats.diagnostic import acorr_ljungbox
      df = pd.read_table('data/m-ibm3dx2608.txt', delim_whitespace=True)
@@ -83,7 +83,7 @@
 
 **** CRSP对数收益率 
      Q5: 28.38, p-vlaue: 3.07e-5, 结论: 有序列相关性
-     #+BEGIN_SRC python
+     #+BEGIN_SRC python :exports both
      import math
      import pandas as pd
      from statsmodels.stats.diagnostic import acorr_ljungbox
@@ -152,7 +152,7 @@
 ****** 求解差分方程
        - 解方程得到: x1 = -1.92, x2 = 1.60 - 1.06i, x3 = 1.60 + 1.06i
        - 其中x2和x3共轭
-       #+BEGIN_SRC python :results output
+       #+BEGIN_SRC python :results output :exports both
        from sympy import *
        x = symbols('x')
        equation = Eq(1 - 0.3480 * x -  0.1793 * x ** 2 - (-0.1413) * x ** 3 , 0)
