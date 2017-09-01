@@ -1,11 +1,7 @@
 
-# load data
-da = read.table("data/m-ibm3dx2608.txt", header=T)
-sibm = da[,2]
-libm = log(sibm+1)
+gnp = scan(file="data/dgnp82.txt")
+m1 = ar(gnp, method="mle")
+m1
+# gnp = ts(da, frequency=4, start=c(1947, 2))
+# plot(gnp)
 
-#  
-Box.test(sibm, lag=5, type="Ljung-Box")
-
-# 
-Box.test(libm, lag=5, type="Ljung-Box")

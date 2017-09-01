@@ -104,12 +104,92 @@
 *** 高斯白噪声
     - 如果{rt}是白噪声, 而且还服从均值为0，方差为6^2的正太分布，就是高斯白噪声序列.
 ** 线性时间序列
-
-
 ** AR: 自回归模型(Autoregressive model) [[[https://zh.wikipedia.org/wiki/%25E8%2587%25AA%25E8%25BF%25B4%25E6%25AD%25B8%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 统计上一种处理时间序列的方法, 用同一变数例如x的之前各期, 亦即x(1)至x(t-1)来预测本期x(t)的表现, 并假设它们为一线性关系.
    - 因为这是从回归分析中的线性回归发展而来, 只是不用x预测y, 而是用x预测x（自己）; 所以叫做自回归.
    - 自回归模型被广泛运用在经济学, 信息学, 自然现象的预测上
+*** AR(1)
+    - 形式: r(t) = b0 + b1 * r(t-1) + a(t)
+**** AR(1)的稳定性
+     - AR(1)实际上也是一个序列
+     - AR(1)模型弱平稳的充分必要: |b1| < 0
+     - b1度量了AR(1)模型相关性的可持续性
+**** AR(1)的自相关函数
+     - AR(1)的自相关函数呈现非常明显的衰减性
+*** AR(2)
+    - 形式: r(t) = b0 + b1 * r(t-1) + b2 * r(t-2) + a(t)
+**** 差分方程
+     - 形式: 1 - b1 * x - b2 * x^2 = 0
+     - 差分方程的解的"倒数"为AR(2)模型的特征根
+     - 如果差分方程有实数解, 则可以认为AR(2)是两个AR(1)的叠加, 其ACF认为是两个衰减指数的叠加.
+     - 如果没有实数解, ACF出现一个减幅正玄波图像, 说明存在随机商业环
+     - 随机商业环的平均长度可以被计算
+***** 美国GNP例子
+      - 这是一个3阶的问题, 通过因式分解转化为1阶和2阶的组合
+****** GNP和GDP区别
+       - GNP=本国公民在本国的收入+本国公民在外国的收入
+       - GDP=本国公民在本国的收入+外国公民在本国的收入
+
+****** AR建模
+       - 通过R语言的AR求解, 得到一个3阶的AR模型
+       #+BEGIN_SRC R :results output :exports both
+       gnp = scan(file="data/dgnp82.txt")
+       m1 = ar(gnp, method="mle")
+       m1
+       #+END_SRC
+
+       #+RESULTS:
+       : 
+       : Call:
+       : ar(x = gnp, method = "mle")
+       : 
+       : Coefficients:
+       :       1        2        3  
+       :  0.3480   0.1793  -0.1423  
+       : 
+       : Order selected 3  sigma^2 estimated as  9.427e-05
+
+****** 求解差分方程
+       - 解方程得到: x1 = -1.92, x2 = 1.60 - 1.06i, x3 = 1.60 + 1.06i
+       - 其中x2和x3共轭
+       #+BEGIN_SRC python :results output
+       from sympy import *
+       x = symbols('x')
+       equation = Eq(1 - 0.3480 * x -  0.1793 * x ** 2 - (-0.1413) * x ** 3 , 0)
+       print solveset(equation)     
+       #+END_SRC
+
+       #+RESULTS:
+       : {-1.9237144183584, 1.59632288504615 - 1.06331883116012*I, 1.59632288504615 + 1.06331883116012*I}
+     
+****** 降阶
+       - 通过方程的解给方程降阶
+       - 对差分方程因式分解: (1 + 0.521 * x) * (1 - 0.869 * x + 0.274 * x^2) = 0
+       - 问题转化为一个一阶和一个二阶的组合
+       - 难点: 如何进行因式分解? 
+   
+****** 求解经济周期
+       - 
+       #+BEGIN_SRC python :results output :exports both
+       from math import acos
+       # 2 * 3.14159 / acos(b1/(2*(-b2 ** .5)))
+       print 2 * 3.14159 / acos(0.869/(2*(0.274 ** .5))) 
+       #+END_SRC 
+
+       #+RESULTS:
+       : 10.6213043471
+
+**** 平稳性
+     - 两个特征根的模都小于1, 即特征方程的解的模都大于1
+
+*** AR(P)
+**** 稳定性
+     - 和AR(2)类似, 如果差分方程的 "解" 的 "模" 都大于1, 则AR(P)具有弱平稳性
+     
+*** AR定阶
+    - AR的定阶通常有两种方法:
+**** PACF: 偏自相关函数(Partial Auto Correlation Function)
+**** 信息准则函数
 ** MA: 滑动平均模型
 ** ARMA: 自回归滑动平均模型(Autoregressive moving average model) [[[https://zh.wikipedia.org/wiki/ARMA%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 是研究时间序列的重要方法，由自回归模型（简称AR模型）与滑动平均模型（简称MA模型）为基础“混合”构成
@@ -132,21 +212,5 @@
 ** VAR: 向量自回归模型(Vector Autoregression model) [[[https://zh.wikipedia.org/wiki/%25E5%2590%2591%25E9%2587%258F%25E8%2587%25AA%25E5%259B%259E%25E5%25BD%2592%25E6%25A8%25A1%25E5%259E%258B][参考]]]
    - 是一种常用的计量经济模型，由计量经济学家和宏观经济学家克里斯托弗·西姆斯（英语：Christopher Sims）提出.
    - 它扩充了只能使用一个变量的自回归模型（简称：AR模型），使容纳大于1个变量，因此经常用在多变量时间序列模型的分析上。
-     
 
-
-
-#+BEGIN_SRC python :session :results file
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-fig=plt.figure(figsize=(3,2))
-plt.plot([1,3,2])
-fig.tight_layout()
-plt.savefig('myfig.pdf')
-'myfig.pdf' # return this to org-mode
-#+END_SRC
-
-#+RESULTS:
-[[file:myfig.pdf]]
 
