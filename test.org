@@ -1,5 +1,5 @@
-* test1
-** 算法1
+* ord-mode测试
+** 输入结果
    - 代码
    #+BEGIN_SRC python :results output :exports both
    print u'test'
@@ -8,3 +8,19 @@
    - 执行结果
    #+RESULTS:
    : test
+** 输出图片
+   #+BEGIN_SRC ipython :session :results raw drawer :exports both
+   # %matplotlib inline
+   from pandas import Series
+   s = Series(range(10))
+   s.plot()
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   <matplotlib.axes._subplots.AxesSubplot at 0x7f0fa170e390>
+   <matplotlib.figure.Figure at 0x7f0fa1723090>
+   :END:
+
+
+** 显示公式
