@@ -1,0 +1,10 @@
+* test1
+** 算法1
+   - 代码
+   #+BEGIN_SRC python :results output :exports both
+   print u'test'
+   #+END_SRC
+
+   - 执行结果
+   #+RESULTS:
+   : test
